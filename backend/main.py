@@ -122,3 +122,19 @@ useEffect(() => {
     ${w.win} – {w.machine}
   </div>
 ))}
+@app.get("/machine-list")
+def machine_list():
+    cursor.execute("SELECT name FROM machines ORDER BY name ASC")
+    rows = cursor.fetchall()
+
+    return [r[0] for r in rows]
+    machines = [
+    "Dragon Link #24",
+    "Lightning Link #11",
+    "Buffalo Gold #6"
+]
+
+for m in machines:
+    cursor.execute("INSERT OR IGNORE INTO machines (name) VALUES (?)", (m,))
+
+conn.commit()
