@@ -228,3 +228,25 @@ def login(data: dict):
 
     for conn in connections:
         await conn.send_json(alert)
+user_id = session["metadata"]["user_id"]
+user_id = session["metadata"]["user_id"]
+cursor.execute("""
+ALTER TABLE users ADD COLUMN trial_end TIMESTAMP
+""")
+if event["type"] == "checkout.session.completed":
+    session = event["data"]["object"]
+    user_id = session["metadata"]["user_id"]
+
+    subscription = stripe.Subscription.retrieve(
+        session["subscription"]
+    )
+
+    trial_end = subscription["trial_end"]
+
+    cursor.execute("""
+        UPDATE users
+        SET is_premium=1, trial_end=?
+        WHERE id=?
+    """, (trial_end, user_id))
+
+    conn.commit()
