@@ -216,6 +216,12 @@ def login(data: dict):
     if win > 50:  # threshold for alert
     alert = {
         "type": "big_win",
+        session = stripe.checkout.Session.create(
+    ...
+    metadata={
+        "user_id": user_id
+    }
+)
         "machine": name,
         "amount": win
     }
