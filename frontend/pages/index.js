@@ -23,3 +23,18 @@ export default function Home() {
     </div>
   );
 }
+const uploadImage = async (e) => {
+  const file = e.target.files[0];
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(API + "/detect", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  alert(JSON.stringify(data));
+};
+<input type="file" onChange={uploadImage} />
