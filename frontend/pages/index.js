@@ -38,3 +38,5 @@ const uploadImage = async (e) => {
   alert(JSON.stringify(data));
 };
 <input type="file" onChange={uploadImage} />
+const wsProtocol = API.startsWith("https") ? "wss" : "ws";
+const ws = new WebSocket(API.replace(/^https?/, wsProtocol) + "/ws");
