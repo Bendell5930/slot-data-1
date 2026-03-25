@@ -110,3 +110,8 @@ def recent_wins():
         for r in rows
     ]
 const [wins, setWins] = useState([]);
+useEffect(() => {
+  fetch(API + "/recent-wins")
+    .then(res => res.json())
+    .then(setWins);
+}, []);
