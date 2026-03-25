@@ -94,3 +94,18 @@ async def log_spin(data: dict):
     await broadcast()
 
     return {"heat": heat}
+@app.get("/recent-wins")
+def recent_wins():
+    cursor.execute("""
+        SELECT machine, win, created_at
+        FROM spins
+        WHERE win > 0
+        ORDER BY created_at DESC
+        LIMIT 10
+    """)
+    rows = cursor.fetchall()
+
+    return [
+        {"machine": r[0], "win": r[1], "time": r[2]}
+        for r in rows
+    ]
