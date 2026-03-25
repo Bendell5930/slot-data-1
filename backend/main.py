@@ -109,3 +109,4 @@ def recent_wins():
         {"machine": r[0], "win": r[1], "time": r[2]}
         for r in rows
     ]
+const [wins, setWins] = useState([]);
