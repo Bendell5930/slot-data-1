@@ -46,3 +46,9 @@ const uploadImage = async (e) => {
 const wsProtocol = API.startsWith("https") ? "wss" : "ws";
 const ws = new WebSocket(API.replace(/^https?/, wsProtocol) + "/ws");
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+<input
+  type="number"
+  placeholder="Win Amount"
+  value={win}
+  onChange={(e) => setWin(e.target.value)}
+/>
