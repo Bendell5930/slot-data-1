@@ -94,3 +94,32 @@ const submitSpin = async () => {
   setWin(0);
   setBonus(false);
 };
+const [casinos, setCasinos] = useState([]);
+const [casinoId, setCasinoId] = useState("");
+useEffect(() => {
+  fetch(API + "/casinos")
+    .then(res => res.json())
+    .then(setCasinos);
+}, []);
+<select onChange={(e) => setCasinoId(e.target.value)}>
+  <option>Select Casino</option>
+  {casinos.map(c => (
+    <option key={c.id} value={c.id}>{c.name}</option>
+  ))}
+</select>
+useEffect(() => {
+  if (!casinoId) return;
+
+  fetch(API + "/machines/" + casinoId)
+    .then(res => res.json())
+    .then(setMachines);
+}, [casinoId]);
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.type === "big_win") {
+    alert(`💰 BIG WIN: $${data.amount} on ${data.machine}`);
+  } else {
+    setMachines(data);
+  }
+};
