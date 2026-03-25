@@ -38,3 +38,9 @@ async def log_spin(data: dict = Body(...)):
 
     return {"status": "ok"}
 from db import conn, cursor
+@app.get("/machines")
+def get_machines():
+    cursor.execute("SELECT name, heat FROM machines")
+    rows = cursor.fetchall()
+
+    return [{"name": r[0], "heat": r[1]} for r in rows]
