@@ -138,3 +138,87 @@ for m in machines:
     cursor.execute("INSERT OR IGNORE INTO machines (name) VALUES (?)", (m,))
 
 conn.commit()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS casinos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE
+)
+""")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS machines (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    casino_id INTEGER,
+    heat INTEGER DEFAULT 50,
+    spins_since_bonus INTEGER DEFAULT 0,
+    total_spins INTEGER DEFAULT 0,
+    total_wins INTEGER DEFAULT 0,
+    UNIQUE(name, casino_id)
+)
+""")
+casinos = ["Star Brisbane", "Treasury Casino"]
+
+for c in casinos:
+    cursor.execute("INSERT OR IGNORE INTO casinos (name) VALUES (?)", (c,))
+
+# Example machines
+cursor.execute("SELECT id FROM casinos WHERE name='Star Brisbane'")
+star_id = cursor.fetchone()[0]
+
+machines = [
+    ("Dragon Link #24", star_id),
+    ("Lightning Link #11", star_id)
+]
+
+for m in machines:
+    cursor.execute("INSERT OR IGNORE INTO machines (name, casino_id) VALUES (?, ?)", m)
+
+conn.commit()
+@app.get("/casinos")
+def get_casinos():
+    cursor.execute("SELECT id, name FROM casinos")
+    return [{"id": r[0], "name": r[1]} for r in cursor.fetchall()]
+    @app.get("/machines/{casino_id}")
+def get_machines(casino_id: int):
+    cursor.execute("""
+        SELECT name, heat FROM machines WHERE casino_id=?
+    """, (casino_id,))
+    return [{"name": r[0], "heat": r[1]} for r in cursor.fetchall()]
+    cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT
+)
+""")
+    @app.post("/register")
+def register(data: dict):
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            (data["username"], data["password"])
+        )
+        conn.commit()
+        return {"status": "ok"}
+    except:
+        return {"error": "User exists"}
+        @app.post("/login")
+def login(data: dict):
+    cursor.execute(
+        "SELECT id FROM users WHERE username=? AND password=?",
+        (data["username"], data["password"])
+    )
+    user = cursor.fetchone()
+
+    if user:
+        return {"status": "ok", "user_id": user[0]}
+    return {"error": "Invalid login"}
+    if win > 50:  # threshold for alert
+    alert = {
+        "type": "big_win",
+        "machine": name,
+        "amount": win
+    }
+
+    for conn in connections:
+        await conn.send_json(alert)
