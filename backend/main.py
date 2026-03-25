@@ -37,3 +37,4 @@ async def log_spin(data: dict = Body(...)):
     await broadcast()
 
     return {"status": "ok"}
+from db import conn, cursor
