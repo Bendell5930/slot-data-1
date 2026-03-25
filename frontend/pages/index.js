@@ -33,7 +33,12 @@ const uploadImage = async (e) => {
     method: "POST",
     body: formData
   });
-
+<input
+  type="number"
+  placeholder="Win Amount"
+  value={win}
+  onChange={(e) => setWin(e.target.value)}
+/>
   const data = await res.json();
   alert(JSON.stringify(data));
 };
