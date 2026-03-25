@@ -115,3 +115,10 @@ useEffect(() => {
     .then(res => res.json())
     .then(setWins);
 }, []);
+<h2>💰 Recent Wins</h2>
+
+{wins.map((w, i) => (
+  <div key={i}>
+    ${w.win} – {w.machine}
+  </div>
+))}
