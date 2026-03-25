@@ -52,3 +52,45 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   value={win}
   onChange={(e) => setWin(e.target.value)}
 />
+<input
+  placeholder="Machine Name"
+  value={machine}
+  onChange={(e) => setMachine(e.target.value)}
+/>
+    const [machineList, setMachineList] = useState([]);
+fetch(API + "/machine-list")
+  .then(res => res.json())
+  .then(setMachineList);
+<select
+  value={machine}
+  onChange={(e) => setMachine(e.target.value)}
+>
+  <option value="">Select Machine</option>
+  {machineList.map((m, i) => (
+    <option key={i} value={m}>
+      {m}
+    </option>
+  ))}
+</select>
+const submitSpin = async () => {
+  if (!machine) {
+    alert("Please select a machine");
+    return;
+  }
+
+  await fetch(API + "/spin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      machine,
+      win: Number(win),
+      bonus
+    })
+  });
+
+  setMachine("");
+  setWin(0);
+  setBonus(false);
+};
