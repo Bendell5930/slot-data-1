@@ -1,245 +1,116 @@
+import { useEffect, useMemo, useState } from "react";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function Home() {
-  const machines = [
-    { name: "Dragon Link #24", heat: 80 },
-    { name: "Lightning Link #11", heat: 55 },
-    { name: "Buffalo Gold #6", heat: 20 }
-  ];
+  const [machines, setMachines] = useState([]);
+  const [machineList, setMachineList] = useState([]);
+  const [wins, setWins] = useState([]);
+  const [machine, setMachine] = useState("");
+  const [win, setWin] = useState(0);
+  const [bonus, setBonus] = useState(false);
+
+  const orderedMachines = useMemo(
+    () => [...machines].sort((a, b) => b.heat - a.heat),
+    [machines]
+  );
+
+  const loadData = async () => {
+    const [machinesRes, listRes, winsRes] = await Promise.all([
+      fetch(`${API}/machines`),
+      fetch(`${API}/machine-list`),
+      fetch(`${API}/recent-wins`),
+    ]);
+
+    const [machinesData, listData, winsData] = await Promise.all([
+      machinesRes.json(),
+      listRes.json(),
+      winsRes.json(),
+    ]);
+
+    setMachines(machinesData);
+    setMachineList(listData);
+    setWins(winsData);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const submitSpin = async () => {
+    if (!machine) {
+      alert("Please select a machine");
+      return;
+    }
+
+    await fetch(`${API}/spin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ machine, win: Number(win), bonus }),
+    });
+
+    setWin(0);
+    setBonus(false);
+    await loadData();
+  };
 
   return (
-    <div style={{padding:20}}>
+    <div style={{ maxWidth: 880, margin: "0 auto", padding: 20, fontFamily: "sans-serif" }}>
       <h1>🔥 Slot Machine Heat Map</h1>
-      {machines.map((m,i)=>(
-        <div key={i} style={{marginBottom:10}}>
-          <strong>{m.name}</strong>
-          <div style={{background:"#eee",height:10}}>
-            <div style={{
-              width: m.heat+"%",
-              height:10,
-              background: m.heat>70?"red":m.heat>40?"orange":"blue"
-            }}/>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+        <select value={machine} onChange={(e) => setMachine(e.target.value)}>
+          <option value="">Select Machine</option>
+          {machineList.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="number"
+          placeholder="Win Amount"
+          value={win}
+          onChange={(e) => setWin(e.target.value)}
+        />
+
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <input type="checkbox" checked={bonus} onChange={(e) => setBonus(e.target.checked)} />
+          Bonus
+        </label>
+
+        <button onClick={submitSpin}>Log Spin</button>
+      </div>
+
+      <h2>Machines</h2>
+      {orderedMachines.map((m) => (
+        <div key={m.name} style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <strong>{m.name}</strong>
+            <span>{m.heat}%</span>
+          </div>
+          <div style={{ background: "#eee", height: 12, borderRadius: 6 }}>
+            <div
+              style={{
+                width: `${m.heat}%`,
+                height: 12,
+                borderRadius: 6,
+                background: m.heat > 70 ? "#dc2626" : m.heat > 40 ? "#f59e0b" : "#2563eb",
+              }}
+            />
           </div>
         </div>
       ))}
+
+      <h2 style={{ marginTop: 28 }}>💰 Recent Wins</h2>
+      {wins.length === 0 ? (
+        <p>No wins yet.</p>
+      ) : (
+        wins.map((w, i) => (
+          <div key={`${w.machine}-${i}`}>${w.win} - {w.machine}</div>
+        ))
+      )}
     </div>
   );
 }
-const uploadImage = async (e) => {
-  const file = e.target.files[0];
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const res = await fetch(API + "/detect", {
-    method: "POST",
-    body: formData
-  });
-<input
-  type="number"
-  placeholder="Win Amount"
-  value={win}
-  onChange={(e) => setWin(e.target.value)}
-/>
-  const data = await res.json();
-  alert(JSON.stringify(data));
-};
-<input type="file" onChange={uploadImage} />
-const wsProtocol = API.startsWith("https") ? "wss" : "ws";
-const ws = new WebSocket(API.replace(/^https?/, wsProtocol) + "/ws");
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-<input
-  type="number"
-  placeholder="Win Amount"
-  value={win}
-  onChange={(e) => setWin(e.target.value)}
-/>
-<input
-  placeholder="Machine Name"
-  value={machine}
-  onChange={(e) => setMachine(e.target.value)}
-/>
-    const [machineList, setMachineList] = useState([]);
-fetch(API + "/machine-list")
-  .then(res => res.json())
-  .then(setMachineList);
-<select
-  value={machine}
-  onChange={(e) => setMachine(e.target.value)}
->
-  <option value="">Select Machine</option>
-  {machineList.map((m, i) => (
-    <option key={i} value={m}>
-      {m}
-    </option>
-  ))}
-</select>
-const submitSpin = async () => {
-  if (!machine) {
-    alert("Please select a machine");
-    return;
-  }
-
-  await fetch(API + "/spin", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      machine,
-      win: Number(win),
-      bonus
-    })
-  });
-
-  setMachine("");
-  setWin(0);
-  setBonus(false);
-};
-const [casinos, setCasinos] = useState([]);
-const [casinoId, setCasinoId] = useState("");
-useEffect(() => {
-  fetch(API + "/casinos")
-    .then(res => res.json())
-    .then(setCasinos);
-}, []);
-<select onChange={(e) => setCasinoId(e.target.value)}>
-  <option>Select Casino</option>
-  {casinos.map(c => (
-    <option key={c.id} value={c.id}>{c.name}</option>
-  ))}
-</select>
-useEffect(() => {
-  if (!casinoId) return;
-
-  fetch(API + "/machines/" + casinoId)
-    .then(res => res.json())
-    .then(setMachines);
-}, [casinoId]);
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-
-  if (data.type === "big_win") {
-    alert(`💰 BIG WIN: $${data.amount} on ${data.machine}`);
-  } else {
-    setMachines(data);
-  }
-};
-// public/firebase-messaging-sw.js
-importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js");
-import { getMessaging, getToken } from "firebase/messaging";
-
-const messaging = getMessaging();
-
-await Notification.requestPermission();
-
-const token = await getToken(messaging, {
-  vapidKey: "YOUR_KEY"
-});
-const [leaders, setLeaders] = useState([]);
-useEffect(() => {
-  fetch(API + "/leaderboard")
-    .then(res => res.json())
-    .then(setLeaders);
-}, []);
-<h2>🏆 Top Machines</h2>
-
-{leaders.map((l, i) => (
-  <div key={i}>
-    #{i + 1} {l.machine} — ${l.total}
-  </div>
-))}
-const [stats, setStats] = useState(null);
-const userId = localStorage.getItem("user_id");
-useEffect(() => {
-  if (!userId) return;
-
-  fetch(API + "/user-stats/" + userId)
-    .then(res => res.json())
-    .then(setStats);
-}, []);
-<h2>👤 My Stats</h2>
-
-{stats && (
-  <div>
-    Spins: {stats.spins} <br />
-    Total Won: ${stats.winnings}
-  </div>
-)}
-<div style={{
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: 10
-}}>
-  {machines.map((m, i) => (
-    <div
-      key={i}
-      style={{
-        padding: 20,
-        textAlign: "center",
-        background:
-          m.heat > 70 ? "red" :
-          m.heat > 40 ? "orange" : "blue",
-        color: "white",
-        borderRadius: 8
-      }}
-    >
-      {m.name}
-      <br />
-      {m.heat}%
-    </div>
-  ))}
-</div>
-npm install -g expo-cli
-npx create-expo-app slot-tracker-app
-cd slot-tracker-app
-npm install react-native-webview
-import { WebView } from "react-native-webview";
-
-export default function App() {
-  return (
-    <WebView source={{ uri: "https://your-railway-frontend-url" }} />
-  );
-}
-npx expo start
-npx expo prebuild
-npx expo run:android
-localStorage.setItem("token", data.token);
-headers: {
-  Authorization: "Bearer " + localStorage.getItem("token")
-}
-const [admin, setAdmin] = useState(null);
-
-useEffect(() => {
-  fetch(API + "/admin/stats")
-    .then(res => res.json())
-    .then(setAdmin);
-}, []);
-<h2>📊 Admin Dashboard</h2>
-localStorage.setItem("token", data.token);
-headers: {
-  Authorization: "Bearer " + localStorage.getItem("token")
-}
-
-{admin && (
-  <div>
-    Users: {admin.users} <br />
-    Spins Logged: {admin.spins} <br />
-    Total Wins: ${admin.total_wins}
-  </div>
-)}
-const [admin, setAdmin] = useState(null);
-
-useEffect(() => {
-  fetch(API + "/admin/stats")
-    .then(res => res.json())
-    .then(setAdmin);
-}, []);
-<h2>📊 Admin Dashboard</h2>
-
-{admin && (
-  <div>
-    Users: {admin.users} <br />
-    Spins Logged: {admin.spins} <br />
-    Total Wins: ${admin.total_wins}
-  </div>
-)}
