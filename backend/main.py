@@ -418,3 +418,19 @@ def get_current_user(token=Depends(security)):
     return payload["user_id"]
     @app.get("/user-stats")
 def user_stats(user_id: int = Depends(get_current_user)):
+@app.get("/admin/stats")
+def admin_stats():
+    cursor.execute("SELECT COUNT(*) FROM users")
+    users = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM spins")
+    spins = cursor.fetchone()[0]
+
+    cursor.execute("SELECT SUM(win) FROM spins")
+    revenue = cursor.fetchone()[0] or 0
+
+    return {
+        "users": users,
+        "spins": spins,
+        "total_wins": revenue
+    }
