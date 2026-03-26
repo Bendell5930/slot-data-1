@@ -148,3 +148,44 @@ useEffect(() => {
     #{i + 1} {l.machine} — ${l.total}
   </div>
 ))}
+const [stats, setStats] = useState(null);
+const userId = localStorage.getItem("user_id");
+useEffect(() => {
+  if (!userId) return;
+
+  fetch(API + "/user-stats/" + userId)
+    .then(res => res.json())
+    .then(setStats);
+}, []);
+<h2>👤 My Stats</h2>
+
+{stats && (
+  <div>
+    Spins: {stats.spins} <br />
+    Total Won: ${stats.winnings}
+  </div>
+)}
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: 10
+}}>
+  {machines.map((m, i) => (
+    <div
+      key={i}
+      style={{
+        padding: 20,
+        textAlign: "center",
+        background:
+          m.heat > 70 ? "red" :
+          m.heat > 40 ? "orange" : "blue",
+        color: "white",
+        borderRadius: 8
+      }}
+    >
+      {m.name}
+      <br />
+      {m.heat}%
+    </div>
+  ))}
+</div>
