@@ -215,6 +215,10 @@ useEffect(() => {
     .then(setAdmin);
 }, []);
 <h2>📊 Admin Dashboard</h2>
+localStorage.setItem("token", data.token);
+headers: {
+  Authorization: "Bearer " + localStorage.getItem("token")
+}
 
 {admin && (
   <div>
