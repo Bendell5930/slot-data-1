@@ -250,3 +250,51 @@ if event["type"] == "checkout.session.completed":
     """, (trial_end, user_id))
 
     conn.commit()
+session = stripe.checkout.Session.create(
+    ...
+    metadata={
+        "user_id": user_id
+    }
+)
+user_id = session["metadata"]["user_id"]
+@app.post("/create-checkout-session")
+def create_checkout(user_id: int):
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        mode="subscription",
+        line_items=[{
+            "price": "YOUR_PRICE_ID",
+            "quantity": 1,
+        }],
+        subscription_data={
+            "trial_period_days": 7
+        },
+        metadata={
+            "user_id": user_id
+        },
+        success_url="https://your-frontend-url/success",
+        cancel_url="https://your-frontend-url/cancel",
+    )
+
+    return {"url": session.url}
+    cursor.execute("""
+ALTER TABLE users ADD COLUMN trial_end TIMESTAMP
+""")
+    if event["type"] == "checkout.session.completed":
+    session = event["data"]["object"]
+    user_id = session["metadata"]["user_id"]
+
+    subscription = stripe.Subscription.retrieve(
+        session["subscription"]
+    )
+
+    trial_end = subscription["trial_end"]
+
+    cursor.execute("""
+        UPDATE users
+        SET is_premium=1, trial_end=?
+        WHERE id=?
+    """, (trial_end, user_id))
+
+    conn.commit()
+    
