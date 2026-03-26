@@ -123,3 +123,15 @@ ws.onmessage = (event) => {
     setMachines(data);
   }
 };
+// public/firebase-messaging-sw.js
+importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js");
+importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js");
+import { getMessaging, getToken } from "firebase/messaging";
+
+const messaging = getMessaging();
+
+await Notification.requestPermission();
+
+const token = await getToken(messaging, {
+  vapidKey: "YOUR_KEY"
+});
