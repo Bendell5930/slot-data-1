@@ -189,3 +189,17 @@ useEffect(() => {
     </div>
   ))}
 </div>
+npm install -g expo-cli
+npx create-expo-app slot-tracker-app
+cd slot-tracker-app
+npm install react-native-webview
+import { WebView } from "react-native-webview";
+
+export default function App() {
+  return (
+    <WebView source={{ uri: "https://your-railway-frontend-url" }} />
+  );
+}
+npx expo start
+npx expo prebuild
+npx expo run:android
