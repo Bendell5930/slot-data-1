@@ -292,6 +292,38 @@ ALTER TABLE users ADD COLUMN trial_end TIMESTAMP
 
     cursor.execute("""
         UPDATE users
+        pip install pyfcm
+        from pyfcm import FCMNotification
+
+push_service = FCMNotification(api_key="YOUR_FIREBASE_KEY")
+
+def send_notification(title, body):
+    push_service.notify_all_devices(
+        message_title=title,
+        message_body=body
+    )
+    if win > 50:
+    send_notification(
+        "💰 Big Win!",
+        f"{name} just hit ${win}"
+    )
+    @app.get("/leaderboard")
+def leaderboard():
+    cursor.execute("""
+        SELECT machine, SUM(win) as total
+        FROM spins
+        GROUP BY machine
+        ORDER BY total DESC
+        LIMIT 10
+    """)
+
+    rows = cursor.fetchall()
+
+    return [
+        {"machine": r[0], "total": r[1]}
+        for r in rows
+    ]
+    
         SET is_premium=1, trial_end=?
         WHERE id=?
     """, (trial_end, user_id))
