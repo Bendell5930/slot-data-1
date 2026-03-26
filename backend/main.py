@@ -323,6 +323,37 @@ def leaderboard():
         {"machine": r[0], "total": r[1]}
         for r in rows
     ]
+    cursor.execute("""
+CREATE TABLE IF NOT EXISTS user_spins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    machine TEXT,
+    win REAL,
+    bonus BOOLEAN,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+user_id = data.get("user_id")
+
+if user_id:
+    cursor.execute("""
+        INSERT INTO user_spins (user_id, machine, win, bonus)
+        VALUES (?, ?, ?, ?)
+    """, (user_id, name, win, bonus))
+    @app.get("/user-stats/{user_id}")
+def user_stats(user_id: int):
+    cursor.execute("""
+        SELECT COUNT(*), SUM(win)
+        FROM user_spins
+        WHERE user_id=?
+    """, (user_id,))
+    
+    total_spins, total_wins = cursor.fetchone()
+
+    return {
+        "spins": total_spins or 0,
+        "winnings": total_wins or 0
+    }
     
         SET is_premium=1, trial_end=?
         WHERE id=?
