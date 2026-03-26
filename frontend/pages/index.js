@@ -203,3 +203,7 @@ export default function App() {
 npx expo start
 npx expo prebuild
 npx expo run:android
+localStorage.setItem("token", data.token);
+headers: {
+  Authorization: "Bearer " + localStorage.getItem("token")
+}
