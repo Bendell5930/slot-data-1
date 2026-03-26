@@ -207,3 +207,19 @@ localStorage.setItem("token", data.token);
 headers: {
   Authorization: "Bearer " + localStorage.getItem("token")
 }
+const [admin, setAdmin] = useState(null);
+
+useEffect(() => {
+  fetch(API + "/admin/stats")
+    .then(res => res.json())
+    .then(setAdmin);
+}, []);
+<h2>📊 Admin Dashboard</h2>
+
+{admin && (
+  <div>
+    Users: {admin.users} <br />
+    Spins Logged: {admin.spins} <br />
+    Total Wins: ${admin.total_wins}
+  </div>
+)}
