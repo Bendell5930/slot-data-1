@@ -360,4 +360,61 @@ def user_stats(user_id: int):
     """, (trial_end, user_id))
 
     conn.commit()
-    
+    pip install python-jose passlib[bcrypt]
+    from jose import JWTError, jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta
+
+SECRET_KEY = "supersecretkey"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password):
+    return pwd_context.hash(password)
+
+def verify_password(plain, hashed):
+    return pwd_context.verify(plain, hashed)
+
+def create_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    from auth import hash_password, verify_password, create_token
+    @app.post("/register")
+def register(data: dict):
+    hashed = hash_password(data["password"])
+
+    cursor.execute(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        (data["username"], hashed)
+    )
+    conn.commit()
+
+    return {"status": "ok"}
+    @app.post("/login")
+def login(data: dict):
+    cursor.execute(
+        "SELECT id, password FROM users WHERE username=?",
+        (data["username"],)
+    )
+    user = cursor.fetchone()
+
+    if user and verify_password(data["password"], user[1]):
+        token = create_token({"user_id": user[0]})
+        return {"token": token}
+
+    return {"error": "Invalid login"}
+    from fastapi import Depends
+from fastapi.security import HTTPBearer
+from jose import jwt
+
+security = HTTPBearer()
+
+def get_current_user(token=Depends(security)):
+    payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload["user_id"]
+    @app.get("/user-stats")
+def user_stats(user_id: int = Depends(get_current_user)):
