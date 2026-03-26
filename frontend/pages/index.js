@@ -135,3 +135,16 @@ await Notification.requestPermission();
 const token = await getToken(messaging, {
   vapidKey: "YOUR_KEY"
 });
+const [leaders, setLeaders] = useState([]);
+useEffect(() => {
+  fetch(API + "/leaderboard")
+    .then(res => res.json())
+    .then(setLeaders);
+}, []);
+<h2>🏆 Top Machines</h2>
+
+{leaders.map((l, i) => (
+  <div key={i}>
+    #{i + 1} {l.machine} — ${l.total}
+  </div>
+))}
