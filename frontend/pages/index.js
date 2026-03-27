@@ -35,7 +35,6 @@ export default function Home() {
       machinesRes.json(),
       listRes.json(),
       winsRes.json(),
-    ]);
 
     setMachines(machinesData);
     setMachineList(listData);
