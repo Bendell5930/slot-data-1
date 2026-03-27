@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function Home() {
   const [machines, setMachines] = useState([]);
   const [machineList, setMachineList] = useState([]);
   const [wins, setWins] = useState([]);
-  const [machine, setMachine] = useState("");
+  const [machine, setMachine] = useState('');
   const [win, setWin] = useState(0);
   const [bonus, setBonus] = useState(false);
 
@@ -39,13 +40,13 @@ export default function Home() {
 
   const submitSpin = async () => {
     if (!machine) {
-      alert("Please select a machine");
+      alert('Please select a machine');
       return;
     }
 
     await fetch(`${API}/spin`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ machine, win: Number(win), bonus }),
     });
 
@@ -55,10 +56,10 @@ export default function Home() {
   };
 
   return (
-    <div style={{ maxWidth: 880, margin: "0 auto", padding: 20, fontFamily: "sans-serif" }}>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: 20, fontFamily: 'sans-serif' }}>
       <h1>🔥 Slot Machine Heat Map</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         <select value={machine} onChange={(e) => setMachine(e.target.value)}>
           <option value="">Select Machine</option>
           {machineList.map((m) => (
@@ -75,7 +76,7 @@ export default function Home() {
           onChange={(e) => setWin(e.target.value)}
         />
 
-        <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <input type="checkbox" checked={bonus} onChange={(e) => setBonus(e.target.checked)} />
           Bonus
         </label>
@@ -86,17 +87,17 @@ export default function Home() {
       <h2>Machines</h2>
       {orderedMachines.map((m) => (
         <div key={m.name} style={{ marginBottom: 10 }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <strong>{m.name}</strong>
             <span>{m.heat}%</span>
           </div>
-          <div style={{ background: "#eee", height: 12, borderRadius: 6 }}>
+          <div style={{ background: '#eee', height: 12, borderRadius: 6 }}>
             <div
               style={{
                 width: `${m.heat}%`,
                 height: 12,
                 borderRadius: 6,
-                background: m.heat > 70 ? "#dc2626" : m.heat > 40 ? "#f59e0b" : "#2563eb",
+                background: m.heat > 70 ? '#dc2626' : m.heat > 40 ? '#f59e0b' : '#2563eb',
               }}
             />
           </div>
