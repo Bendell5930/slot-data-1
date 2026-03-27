@@ -1,4 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+// ✅ CORRECT - import at the top
+import { useState, useEffect } from 'react';
+
+export default function Home() {
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  
+  useEffect(() => {
+    loadData();
+  }, []);
+  // ...
+}
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -35,9 +45,8 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
-import { useState, useEffect } from 'react';
 
-export default function Home() {
+    export default function Home() {
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   const wsProtocol = API.startsWith('https') ? 'wss' : 'ws';
 
