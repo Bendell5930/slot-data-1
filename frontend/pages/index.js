@@ -1,4 +1,3 @@
-// ✅ CORRECT - import at the top
 import { useState, useEffect } from 'react';
 
 export default function Home() {
